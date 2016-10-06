@@ -30,7 +30,6 @@ function setupVideo(id) {
 	player = new jsmpeg(MPEG_URL[id], {
 		progressive: true,
 		canvas: canvas,
-		autoplay: true,
 		seekable: true,
 		loop: true
 	});
