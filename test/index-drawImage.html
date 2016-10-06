@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Video playback test</title>
+        <style>
+            body { font-family: sans-serif; }
+        </style>
+    </head>
+    <body>
+
+
+        <main>
+            <canvas></canvas>
+        </main>
+
+        <button class="play" disabled>Play</button>
+        <button class="pause" disabled>Pause</button>
+        <button class="previous" disabled>Previous Frame</button>
+        <button class="next" disabled>Next Frame</button>
+
+        <br>
+
+        <button id="video1" class="load" style="background: #E39A57">Load Video A</button>
+        <button id="video2" class="load" style="background: #75A2B7">Load Video B</button>
+
+
+        <hr>
+
+
+        <h4>Test procedure</h4>
+
+        <ol>
+            <li>Click the orange button to load a video</li>
+            <li>Wait for it to load and start playing</li>
+            <li>Use the previous and next frame buttons to seek repeatedly (these use <code>seekToFrame()</code>)</li>
+            <li>Observe video quality (should be OK — these are low quality videos)</li>
+
+            <li>Click button to load the other video (blue or orange)</li>
+            <li>Wait for it to load and start playing</li>
+            <li>Use the previous and next frame buttons to seek repeatedly</li>
+            <li>Observe video quality (should be obviously broken -- see <a href="#screenshot">issue.jpg</a>)</li>
+        </ol>
+
+        <ul>
+            <li>Reload the page to reset</li>
+            <li>You can start with either video and it will be fine</li>
+            <li>Switching to a second video (without reloading the page) causes the issue when seeking.</li>
+        </ul>
+
+
+        <hr>
+
+
+        <figure id="screenshot">
+            <img src="issue.jpg" alt="">
+            <figcaption>Screenshot showing video artefacts from previous frames</figcaption>
+        </figure>
+
+
+        <script src="../jsmpg.js"></script>
+
+        <script>
+            const MPEG_URL = {
+                video1: 'video-orange.mpg',
+                video2: 'video-blue.mpg'
+            };
+
+            let player;
+
+            function reset() {
+                // cleanup jsmpeg player
+                if (player) {
+                    player.stop();
+
+                    // delete all keys in player
+                    Object.keys(player).forEach(function(key) {
+                        delete player[key];
+                    });
+
+                    player = undefined;
+                }
+
+                // delete all DOM inside main
+                // let main = document.querySelector('main');
+                // while (main.firstChild) {
+                //     main.removeChild(main.firstChild);
+                // }
+
+                // disable non-load buttons
+                document.querySelectorAll('button').forEach(function(button) {
+                    if (button.className !== 'load') {
+                        button.disabled = true;
+                    }
+                });
+            }
+
+            function setupVideo(id) {
+                let main = document.querySelector('main');
+
+                // create a new canvas
+                // let canvas = document.createElement('canvas');
+                // main.appendChild(canvas);
+
+                // reuse canvas
+                let canvas = document.querySelector('canvas');
+
+                // new jsmpeg player
+                player = new jsmpeg(MPEG_URL[id], {
+                    progressive: true,
+                    canvas: canvas,
+                    autoplay: true,
+                    seekable: true,
+                    loop: true
+                });
+
+                // enable all buttons
+                document.querySelectorAll('button').forEach(function(button) {
+                    button.disabled = false;
+                });
+            }
+
+            document.addEventListener('click', function(event) {
+                switch (event.target.className) {
+                    case 'load':
+                        reset();
+                        setupVideo(event.target.id);
+                        break;
+
+                    case 'play':
+                        player.play();
+                        break;
+                    case 'pause':
+                        player.pause();
+                        break;
+                    case 'previous':
+                        player.pause();
+                        if (player.currentFrame > 0) {
+                            // player.seekToFrame(player.currentFrame - 1, true);
+                            let frame = player.nextFrame();
+                            let ctx = document.querySelector('canvas').getContext('2d');
+                            ctx.drawImage(frame);
+                        } else {
+                            player.seekToFrame(player.frameCount - 1, true);
+                        }
+                        break;
+                    case 'next':
+                        player.pause();
+                        if (player.currentFrame < player.frameCount - 1) {
+                            player.seekToFrame(player.currentFrame + 1, true);
+                        } else {
+                            player.seekToFrame(0, true);
+                        }
+                        break;
+                }
+            });
+        </script>
+
+    </body>
+</html>
