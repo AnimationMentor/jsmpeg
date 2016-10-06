@@ -33,13 +33,14 @@
         <ol>
             <li>Click the orange button to load a video</li>
             <li>Wait for it to load and start playing</li>
-            <li>Use the previous and next frame buttons to seek repeatedly (these use <code>seekToFrame()</code>)</li>
+            <li>Use the previous frame buttons to seek repeatedly (uses <code>seekToFrame()</code>)</li>
             <li>Observe video quality (should be OK — these are low quality videos)</li>
 
             <li>Click button to load the other video (blue or orange)</li>
             <li>Wait for it to load and start playing</li>
-            <li>Use the previous and next frame buttons to seek repeatedly</li>
+            <li>Use the previous frame buttons to seek repeatedly</li>
             <li>Observe video quality (should be obviously broken -- see <a href="#screenshot">issue.jpg</a>)</li>
+            <li>Note: using next frame button has no issue (uses <code>nextFrame()</code>)</li>
         </ol>
 
         <ul>
@@ -59,7 +60,8 @@
 
 
         <script src="../jsmpg.js"></script>
-        <script src="test-seekToFrame.js"></script>
+        <script src="test-nextFrame.js"></script>
+
 
     </body>
 </html>
